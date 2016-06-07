@@ -1,0 +1,85 @@
+---
+title: "Barbell lift activity evaluation"
+author: "Stefano Masneri"
+date: "7th June 2016"
+output: html_document
+---
+
+# Overview
+
+Using the dataset kindly provided by <http://groupware.les.inf.puc-rio.br/har>, we want to try estimating how well some people are performing exercises. For this particular project we will use data from acceleroters on various body parts of 6 participants and we will predict the way they did the exercise.
+
+We will start by loading the necessary libraries as well as the datasets.
+
+```{r, message = FALSE}
+rm(list=ls()) 
+library(caret)
+library(randomForest)
+library(e1071)
+set.seed(1981)
+trainData <- read.csv(url('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv'))
+testData <- read.csv(url('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv'))
+```
+
+This is a short description of the dataset, taken from the authors' website:
+
+> Six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).
+
+_______
+
+# Exploratory data analysis and cleaning
+
+The next step is to explore the dataset and see which of the variables are most important to perform prediction. We start by checking the dimension of our training set, and then splitting it into two parts, one for the actual training and one for the validation.
+
+```{r}
+dim(trainData)
+inTrain <- createDataPartition(trainData$classe, p = 0.8, list = F)
+trainSet <- trainData[inTrain, ]
+validSet <- trainData[-inTrain, ]
+```
+
+There are 160 variables. We want to reduce the total number of variables, in order to simplify our model. By a rapid inspection of the dataset we notice that some of the variables (such as the ones in the first five columns) do not provide actual data, while many other variables contains lots of _NA_ or empty values. We will remove all these variables when creating a models, together with the ones with low variance.
+
+```{r}
+# remove first 5 variables
+trainSet <- trainSet[, -(1:5)]
+validSet <- validSet[, -(1:5)]
+# remove low variance variables
+lowVarianceVar <- nearZeroVar(trainSet)
+trainSet <- trainSet[, -lowVarianceVar]
+validSet <- validSet[, -lowVarianceVar]
+# remove variables which contain mostly NAs
+threshNA = 0.9
+tooManyNAs <- sapply(trainSet, function(x) mean(is.na(x)) > threshNA)
+trainSet <- trainSet[, F == tooManyNAs]
+validSet <- validSet[, F == tooManyNAs]
+dim(trainSet)
+```
+
+We managed to reduce the number of variables to 54. We can then start training our model and see how well it performs on the validation set.
+
+# Model training
+
+We will create a model using random forest as algorithm of choice, and using _oob_ as resampling method:
+
+```{r}
+set.seed(19810901)
+trainCtrl <- trainControl(method = "oob", number = 5, verboseIter = F)
+modFit <- train(classe ~ ., data = trainSet, method = "rf", trControl = trainCtrl)
+modFit$finalModel
+```
+
+We will then check the performance of this model on the validation set:
+
+```{r}
+prediction <- predict(modFit, newdata = validSet)
+confMat <- confusionMatrix(prediction, validSet$classe)
+confMat
+```
+
+So our model has an accuracy of about 99.8% on the validation set. The last thing to do is then to perform the prediction of the test set.
+
+```{r}
+predictionTest <- predict(modFit, newdata = testData)
+predictionTest
+```
