@@ -1,0 +1,26 @@
+---
+title: "Svm_example"
+author: "Stefano Masneri"
+date: "13 June 2016"
+output: html_document
+---
+
+# Svm example
+
+This folder contain the code for the project _SVM example_, developed for the "Developing data products" class. 
+
+# Summary
+
+The code is uploaded on Shinyapps.io and can be tested at the following url:
+https://stocastico.shinyapps.io/SVM_Example/
+The application creates an SVM model that predicts the Species of the samples in the iris dataset, using hyperparameters set by the user.
+
+# Details
+The code lets the user choose two parameters for the SVM model:
+
+* Cost
+* Kernel
+
+Once the user has chosen two values for the parameters, he can click the _Classify_ button. This will let the app start creating a model with the above selected parameters. After the training is complete the model will try to predict the Species. After that it checks which prediction were correct and which not.
+
+The user can see the results by looking at the resulting classification accuracy as well as by looking at the plot, which shows in cyan the correct prediction and in red the false ones.

@@ -6,7 +6,8 @@ shinyUI(pageWithSidebar(
                        c("linear" = "linear",
                          "polynomial" = "polynomial",
                          "radial" = "radial"), selected = "linear"),
-    actionButton("go", "Classify!", width = '100%')
+    actionButton("go", "Classify!", width = '100%'),
+    helpText(a(href="./index.html", "Documentation"))
   ),
   mainPanel(
     mainPanel(
