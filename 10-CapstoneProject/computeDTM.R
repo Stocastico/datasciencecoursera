@@ -5,7 +5,7 @@ computeDTM <- function( corpus, n = 1) {
   else
   {
     NgramTokenizer <- function(x) unlist(lapply(ngrams(words(x), n), paste, collapse = " "), use.names = FALSE)
-    dtm <- DocumentTermMatrix(docs, control = list(tokenize = NgramTokenizer))
+    dtm <- DocumentTermMatrix(corpus, control = list(tokenize = NgramTokenizer))
   }
   dtm
 }
