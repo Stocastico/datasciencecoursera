@@ -11,7 +11,7 @@ preprocessCorpus <- function(corpus, profanityDict, removeStopwords = FALSE) {
   }
   #remove profanity
   if (!missing(profanityDict)) {
-    corpus <- tm_map(corpus, removeWords)
+    corpus <- tm_map(corpus, removeWords, profanity)
   }
   #strip whitespace
   corpus <- tm_map(corpus, stripWhitespace)
