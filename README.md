@@ -1,2 +1,3 @@
-# datasciencecoursera
-Main repo for data science specialization
+# Data Science Coursera
+
+This repo contains all the code developed during the data science specialization.
