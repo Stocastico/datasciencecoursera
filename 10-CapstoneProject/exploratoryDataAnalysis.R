@@ -8,11 +8,11 @@ library(stringi)
 library(slam)
 
 #IMPORT DATA
-dirname = "/Users/stefano/CourseraSwiftKey/en_US/"
-dir(dirname)
-blogFile <- paste0(dirname, 'en_US.blogs.txt')
-newsFile <- paste0(dirname, 'en_US.news.txt')
-twitFile <- paste0(dirname, 'en_US.twitter.txt')
+direcname = "/Users/stefano/CourseraSwiftKey/en_US/"
+dir(direcname)
+blogFile <- paste0(direcname, 'en_US.blogs.txt')
+newsFile <- paste0(direcname, 'en_US.news.txt')
+twitFile <- paste0(direcname, 'en_US.twitter.txt')
 blog <- readLines(blogFile, encoding = 'UTF-8', skipNul = TRUE)
 news <- readLines(newsFile, encoding = 'UTF-8', skipNul = TRUE)
 twit <- readLines(twitFile, encoding = 'UTF-8', skipNul = TRUE)
@@ -95,7 +95,7 @@ tail(table(freq), 20)
 
 # terms which appear frequently
 minFreqUnigrams = 5000
-wf <- data.frame(word=names(freq), freq=freq)   
+wf <- data.frame(word=names(freq), freq=freq)
 #wf <- findFreqTerms(dtm_unigram, lowfreq=minFreqUnigrams)
 
 #plots
@@ -117,7 +117,7 @@ ordTri <- order(freqTri)
 freqBi[tail(ordBi, 10)]
 freqTri[tail(ordTri, 10)]
 bf <- data.frame(bigrams=names(freqBi), freq=freqBi)
-tf <- data.frame(trigrams=names(freqTri), freq=freqTri)   
+tf <- data.frame(trigrams=names(freqTri), freq=freqTri)
 
 p <- ggplot(subset(bf, freq>minFreqBigrams), aes(reorder(bigrams, freq), freq))
 p <- p + geom_bar(stat="identity", fill="indianred1")
