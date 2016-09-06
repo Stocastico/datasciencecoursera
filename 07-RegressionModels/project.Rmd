@@ -1,0 +1,109 @@
+---
+title: "Comparison of MPG on cars with automatic and manual transmission"
+author: "Stefano Masneri"
+date: "13/05/2016"
+output: pdf_document
+---
+
+# Executive Summary
+In this document we will investigate the _mtcars_ dataset and will try to answer these two questions:
+
++ Is an automatic or manual transmission better for MPG?
++ Can we quantify the MPG difference between automatic and manual transmissions?
+
+We will create single and multiple variables linear regression models to answer the questions. We noticed when considering a single variable model that *MANUAL* transmission is better than *AUTOMATIC* in terms of Miles per Gallon. The improvement when using *MANUAL* compared to *AUTOMATIC* is about 7 miles per gallon. The results change quite a bit when considering other variables in the model, namely the number of cylinders, the weight and the displacement. In this case the increase in _mpg_ due to the usage of a *MANUAL* transmission system is negligible (0.14 mpg) and statistically not significant.
+
+# Getting and cleaning Data
+We will use for this project the _mtcars_ dataset.
+
+```{r}
+data(mtcars)
+str(cars)
+```
+All the variables are treated as _num_, so we have to convert some of them to factor variables. Since we are mostly concerned with the transmission, we will label the values for the Transmission (_am_) variable, so that "0" becomes _Automatic_ and "1" becomes _Manual_.
+
+```{r}
+mtcars$am <- factor(mtcars$am,labels=c("Automatic","Manual"))
+mtcars$gear <- factor(mtcars$gear)
+mtcars$vs   <- factor(mtcars$vs)
+mtcars$cyl  <- factor(mtcars$cyl)
+mtcars$carb <- factor(mtcars$carb)
+```
+
+To get an idea on how the _mpg_ can vary depending on the transmission used, we just compute some statistics differentiating the two cases, and draw a boxplot of the miles per gallon in the case of automatic and manual transmission (see Appendix, figure 1)
+
+```{r}
+with(mtcars, tapply(mpg, am, mean))
+with(mtcars, tapply(mpg, am, sd))
+with(mtcars, tapply(mpg, am, summary))
+```
+
+It seems as the cars with manual transmission make more miles per gallon than the ones with automatic transmission. We will verify if that is true in the next section.
+
+# Analysis
+
+The obvious thing to do to start the analysis is to create a linear model that fits _mpg_ according to the _transmission_. We also create a model that fits _mpg_ according to all other variables and that will be used later when doing anova.
+
+```{r}
+fit1 <- lm(mpg ~ ., mtcars)
+
+fit2 <- lm(mpg ~ am, mtcars)
+summary(fit2)$coef
+```
+
+From the second model it seems that, with huge statistical significance, the transmission influences the miles per gallon. The model tells us that using a car with _manual_ transmission, the miles per gallon increase by more than 7. We can compute a 95% confidence interval for the increase in _mpg_
+
+```{r}
+est <- summary(fit2)$coef["amManual", "Estimate"]
+err <- summary(fit2)$coef["amManual", "Std. Error"]
+numSamples <- length(mtcars$mpg)
+tstat <- qt(0.975, numSamples - 2)
+est + c(-1, 1) * (err * tstat)
+```
+
+The fact that the interval does not include zero (and the low p-value) means that we can reject the null hypothesis (that is, _mpg_ is not influenced by the transmission type) and conclude that the cars with manual transmission are more efficient than the ones with automatic transmission. Figure 2 of the Appendix shows plots for this model.
+
+Next, we want to select the variables which influence the _mpg_ value the most and to do so we ran anova on the first model.
+
+```{r}
+anova(fit1)
+```
+
+We will then create a model including _cyl_, _disp_ and _wt_. We can already notice, via the analysis of variation, that when including all the variables, the transmission value is not statistically significant. We extract the coefficients and test once again whether the results obtained for the transmission coefficients are significative.
+
+```{r}
+fit3 <- lm(mpg ~ am + wt + cyl + disp, data = mtcars)
+summary(fit3)$coef
+est3 <- summary(fit3)$coef["amManual", "Estimate"]
+err3 <- summary(fit3)$coef["amManual", "Std. Error"]
+tstat <- qt(0.975, numSamples - 5) # 5 because we have 4 variables in this case 
+est3 + c(-1, 1) * (err3 * tstat)
+```
+
+In this case the interval contains 0, so we fail to reject the null hypothesis that the transmission directly influences the miles per gallon value.
+Figure 3 contains the plot for this model.
+
+
+------------
+
+# Appendix
+
+Figure 1:
+
+```{r, echo = FALSE}
+boxplot(mpg ~ am, data = mtcars, col = (c("aquamarine","blueviolet")), ylab = "Miles Per Gallon", xlab = "Transmission Type")
+```
+
+Figure 2: Plot of linear model of mpg ~ am
+
+```{r, fig.width=7, fig.height=7, echo = FALSE}
+par(mfrow=c(2, 2))
+plot(fit2)
+```
+
+Figure 3: Plot of linear model of mpg ~ am + wt + cyl + disp
+
+```{r, fig.width=7, fig.height=7, echo = FALSE}
+par(mfrow=c(2, 2))
+plot(fit3)
+
