@@ -1,0 +1,187 @@
+---
+title: "SwiftKey - Exploratory Data Analysis"
+author: "Stefano Masneri"
+date: "3 September 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+In this report we will analyze the data from news, blogs and tweets written in English. We will explore the statistics of the data, plot some of our findings and describe similarities and differences between the different data sources. Finally, we will describe how we will proceed implementing a text prediction model based on our exploratory data analysis results.
+
+## Setup
+
+The first thing to do is to load the necessary libraries and set a seed for random number generation, in order to guarantee reproducibility of the results
+
+```{r libraries}
+library(NLP)
+library(tm)
+library(SnowballC)
+library(ggplot2)
+library(wordcloud)
+library(stringi)
+library(slam)
+set.seed(20160903)
+```
+
+Then, we load our dataset. We assume that the data has already been downloaded and unzipped
+
+```{r getData}
+dirname = "/Users/stefano/CourseraSwiftKey/en_US/"
+blogFile <- paste0(dirname, 'en_US.blogs.txt')
+newsFile <- paste0(dirname, 'en_US.news.txt')
+twitFile <- paste0(dirname, 'en_US.twitter.txt')
+blog <- readLines(blogFile, encoding = 'UTF-8', skipNul = TRUE)
+news <- readLines(newsFile, encoding = 'UTF-8', skipNul = TRUE)
+twit <- readLines(twitFile, encoding = 'UTF-8', skipNul = TRUE)
+```
+
+To avoid problems during the next steps of the analysis, we remove all non-english characters from the dataset. More thorough analyses could, for example, check the number of words containing foreign characters to estimate the amount of words from other languages. For simplicity, though, we will just remove these characters.
+
+```{r removeForeign}
+blog <- iconv(blog, "latin1", "ASCII", sub="")
+news <- iconv(news, "latin1", "ASCII", sub="")
+twit <- iconv(twit, "latin1", "ASCII", sub="")
+allData = list(blog, news, twit)
+```
+
+## Get basic info about the data
+
+Once the data has been loaded in memory, we extract basic info such as the number of lines and the distribution of words per line. This way we can have an idea of how similiar (or different) our three text files are
+
+```{r basicInfo}
+filenames = c(basename(blogFile), basename(newsFile), basename(twitFile))
+sizes = c(file.info(blogFile)$size, file.info(newsFile)$size, file.info(twitFile)$size ) / (1024*1024)
+numLines = (sapply(allData, length))
+numWords = (sapply(allData, stri_stats_latex)['Words',])
+wordFreq = t(sapply(allData, function(x) summary(stri_count_words(x))[c('Min.', 'Mean', 'Max.')]))
+colnames(wordFreq) = c('Min_words', 'Avg_words', 'Max_words')
+
+fileInfo <- data.frame(
+  'name' = filenames,
+  'size_MBytes' = sizes,
+  'Num_lines' = numLines,
+  'Num_words' = numWords,
+  wordFreq
+)
+fileInfo
+```
+
+We can immediately see that, as expected, the *twitter* dataset contains much shorter sentences (probably because of the 140 character limits). Another thing to note is that the *news* and *blog* datasets, despite being of similar size, differ in the average word length of each sample (blog entries are around 15% longer than news entries) and the longest blog entry is more than three times longer than the longest news entry.
+
+## Sampling the data
+To keep the processing time shorter durin this exploratory step, we decided to sample the dataset. We randomly extract 5% of all the lines in the three dataset using a binomial process. If we were going to create a prediction model discarding 95% of the data wouldn't have made sense, but for a quick exploration of our corpus and get a feeling of the more common words, bigrams and trigrams it is indeed a sensible idea.
+
+```{r samplingData}
+samplingFrac <- 0.05
+subsetBlog <- blog[1 == rbinom(length(blog), 1, samplingFrac)]
+subsetNews <- news[1 == rbinom(length(news), 1, samplingFrac)]
+subsetTwit <- twit[1 == rbinom(length(twit), 1, samplingFrac)]
+subsetAllData <- c(subsetBlog, subsetNews, subsetTwit)
+#CREATE THE CORPUS
+docs <- Corpus(VectorSource(subsetAllData))
+```
+
+## Preprocessing
+We prepare our text for analyses by performing some common tasks, such as removing numbers and punctuation, or setting all the text to lowercase. More refined preprocessing could also remove special characters like "*@*" and "*#*" which are used a lot in tweets.
+
+```{r preprocessing}
+# remove punctuation
+docs <- tm_map(docs, removePunctuation)
+#remove numbers
+docs <- tm_map(docs, removeNumbers)
+#convert to lowercase
+docs <- tm_map(docs, tolower)
+#remove stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+#strip whitespace
+docs <- tm_map(docs, stripWhitespace)
+#treat as text
+docs <- tm_map(docs, PlainTextDocument)
+```
+
+## Calculate Frequencies
+After the preprocessing steps we are finally ready to compute the word frequencies inside our corpus. We will compute the frequencies of single words as well as bigrams and trigrams.
+
+```{r computeFrequencies}
+dtm_unigram <- DocumentTermMatrix(docs)
+#tdm_unigram <- TermDocumentMatrix(docs)
+# do the same for 2-gram and 3-gram
+BigramTokenizer <- function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)
+TrigramTokenizer <- function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " "), use.names = FALSE)
+#tdm_bigram <- TermDocumentMatrix(docs, control = list(tokenize = BigramTokenizer))
+#tdm_trigram <- TermDocumentMatrix(docs, control = list(tokenize = TrigramTokenizer))
+dtm_bigram <- DocumentTermMatrix(docs, control = list(tokenize = BigramTokenizer))
+dtm_trigram <- DocumentTermMatrix(docs, control = list(tokenize = TrigramTokenizer))
+```
+
+## Analyze single word frequencies
+We can now inspect for example the 10 words appearing most and least often
+
+```{r freqWords}
+freq <- col_sums(dtm_unigram)
+length(freq)
+ord <- order(freq)
+freq[head(ord, 10)]
+freq[tail(ord, 10)]
+```
+
+We see that the 10 least common words appear just once. Since it is very likely that a lot of words appear just once in the corpus, it may be interesting to check the distribution of the frequencies, that is how many words appear just once, twice and so on
+
+```{r freqFreqs}
+head(table(freq), 10)
+tail(table(freq), 10)
+```
+
+Here we can see that more than 80000 terms appear just once and more than 16000 words appear just twice. At the other end of the spectrum we see a lot of single words appearing thouseands of times. We can also plot the words that appear at least 5000 times in the corpus
+
+```{r plotFreqWords}
+minFreqUnigrams = 5000
+wf <- data.frame(word=names(freq), freq=freq)   
+
+p <- ggplot(subset(wf, freq>minFreqUnigrams), aes(reorder(word, freq), freq))
+p <- p + geom_bar(stat="identity", fill="deepskyblue")
+p <- p + labs(title="Most Common Words", x="Words", y="Frequency")
+p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
+p
+```
+
+We conclude the analyses of single word frequencies plotting a word cloud with the most common terms, assigning different colors and size based on the frequency of the word
+
+```{r plotWordcloud}
+wordcloud(names(freq), freq, min.freq=5000, scale=c(5, .1), max.words=50, colors=brewer.pal(6, "Dark2"))
+```
+
+## Analyze 2-grams and 3-grams frequencies
+We preform the same analysis for bigrams and trigrams: we'd like to know which of them appear the most in the corpus.
+
+```{r plotBiTrigramFreq}
+minFreqBigram <- 500
+minFreqTrigram <- 50
+freqBi <- col_sums(dtm_bigram)
+freqTri <- col_sums(dtm_trigram)
+ordBi <- order(freqBi)
+ordTri <- order(freqTri)
+freqBi[tail(ordBi, 10)]
+freqTri[tail(ordTri, 10)]
+bf <- data.frame(bigrams=names(freqBi), freq=freqBi)
+tf <- data.frame(trigrams=names(freqTri), freq=freqTri)   
+
+p <- ggplot(subset(bf, freq>minFreqBigram), aes(reorder(bigrams, freq), freq))
+p <- p + geom_bar(stat="identity", fill="indianred1")
+p <- p + labs(title="Most Common Bigrams", x="Bigrams", y="Frequency")
+p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
+p
+
+p <- ggplot(subset(tf, freq>minFreqTrigram), aes(reorder(trigrams, freq), freq))
+p <- p + geom_bar(stat="identity", fill="aquamarine4" )
+p <- p + labs(title="Most Common Trigrams", x="Trigrams", y="Frequency")
+p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
+p
+```
+
+## Conclusion
+We performed exploratory data analysis of the english files provided by SwiftKey. We found out that the most common word appearing in the document (after subsampling and removing the stopwords) is *can*, while the most common bigram and trigram are *right now* and *happy mothers day* respectively. Those results would have probably changed, though, if we decided not to remove stopwords. Using the frequency tables from single words, bigrams and trigrams we can create a basic model for word prediction. The model will predict the next word by choosing the more frequent trigram given the first two words. More refined model will have to be used to predict words when dealing with words which do not appear in the corpus.
