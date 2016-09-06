@@ -5,6 +5,6 @@ This folder contain the code for the project _SVM example_, developed for the "D
 # Summary
 
 The code is uploaded on Shinyapps.io and can be tested at the following url:
-https://stocastico.shinyapps.io/SVM_Example/
+https://stocastico.shinyapps.io/Iris_SVM_Classification/
 
 # Details
