@@ -1,6 +1,6 @@
 computeDTM <- function( corpus, n = 1) {
   if (n == 1) {
-    dtm <- DocumentTermMatrix(corpus)
+    dtm <- DocumentTermMatrix(corpus, control=list(wordLengths=c(1,Inf)))
   }
   else
   {

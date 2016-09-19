@@ -68,7 +68,7 @@ docs <- tm_map(docs, PlainTextDocument)
 # DATA STAGING
 
 #create a document term matrix and a term document matrix
-dtm_unigram <- DocumentTermMatrix(docs)
+dtm_unigram <- DocumentTermMatrix(docs, control=list(wordLengths=c(1,Inf)))
 tdm_unigram <- TermDocumentMatrix(docs)
 # do the same for 2-gram and 3-gram
 BigramTokenizer <- function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)
