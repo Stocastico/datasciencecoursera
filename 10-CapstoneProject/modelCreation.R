@@ -29,14 +29,10 @@ freq_unigram <- list()
 for (k in 1:NUM_CHUNKS) {
   myDocs[[k]] <- Corpus(VectorSource(chunks[[k]]))
   # DATA PROPEROCESSING
-  # remove punctuation
-  myDocs[[k]] <- tm_map(myDocs[[k]], removePunctuation)
   #remove numbers
   myDocs[[k]] <- tm_map(myDocs[[k]], removeNumbers)
   #convert to lowercase
   myDocs[[k]] <- tm_map(myDocs[[k]], tolower)
-  #remove stopwords
-  myDocs[[k]] <- tm_map(myDocs[[k]], removeWords, stopwords("english"))
   #strip whitespace
   myDocs[[k]] <- tm_map(myDocs[[k]], stripWhitespace)
   #treat as text
@@ -55,6 +51,7 @@ tmp2 <- as.data.frame(freq_unigram[[2]])
 colnames(tmp2) <- 'frequency'
 tmp2 <- setDT(tmp2, keep.rownames = TRUE)[]
 freq_unigram_all <- full_join(tmp1, tmp2, by = 'rn')
+freq_unigram_all <- setDT(freq_unigram_all)
 freq_unigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by = rn]
 freq_unigram_all[, frequency.x := NULL]
 freq_unigram_all[, frequency.y := NULL]
@@ -63,7 +60,7 @@ for (k in 3:20) {
   tmp <- as.data.frame(freq_unigram[[k]])
   colnames(tmp) <- 'frequency'
   tmp <- setDT(tmp, keep.rownames = TRUE)[]
-  freq_unigram_all <- full_join(freq_unigram_all, tmp, by = 'rn')
+  freq_unigram_all <- setDT(full_join(freq_unigram_all, tmp, by = 'rn'))
   freq_unigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by = rn]
   freq_unigram_all[, frequency.x := NULL]
   freq_unigram_all[, frequency.y := NULL]
@@ -91,8 +88,6 @@ for (k in 1:NUM_CHUNKS) {
   myDocs[[k]] <- tm_map(myDocs[[k]], removeNumbers)
   #convert to lowercase
   myDocs[[k]] <- tm_map(myDocs[[k]], tolower)
-  #remove stopwords
-  myDocs[[k]] <- tm_map(myDocs[[k]], removeWords, stopwords("english"))
   #strip whitespace
   myDocs[[k]] <- tm_map(myDocs[[k]], stripWhitespace)
   #treat as text
@@ -110,7 +105,7 @@ tmp1 <- setDT(tmp1, keep.rownames = TRUE)[]
 tmp2 <- as.data.frame(freq_bigram[[2]])
 colnames(tmp2) <- 'frequency'
 tmp2 <- setDT(tmp2, keep.rownames = TRUE)[]
-freq_bigram_all <- full_join(tmp1, tmp2, by = 'rn')
+freq_bigram_all <- setDT(full_join(tmp1, tmp2, by = 'rn'))
 freq_bigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by = rn]
 freq_bigram_all[, frequency.x := NULL]
 freq_bigram_all[, frequency.y := NULL]
@@ -119,7 +114,7 @@ for (k in 3:NUM_CHUNKS) {
   tmp <- as.data.frame(freq_bigram[[k]])
   colnames(tmp) <- 'frequency'
   tmp <- setDT(tmp, keep.rownames = TRUE)[]
-  freq_bigram_all <- full_join(freq_bigram_all, tmp, by = 'rn')
+  freq_bigram_all <- setDT(full_join(freq_bigram_all, tmp, by = 'rn'))
   freq_bigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by = rn]
   freq_bigram_all[, frequency.x := NULL]
   freq_bigram_all[, frequency.y := NULL]
@@ -147,8 +142,6 @@ for (k in 1:NUM_CHUNKS) {
   myDocs[[k]] <- tm_map(myDocs[[k]], removeNumbers)
   #convert to lowercase
   myDocs[[k]] <- tm_map(myDocs[[k]], tolower)
-  #remove stopwords
-  myDocs[[k]] <- tm_map(myDocs[[k]], removeWords, stopwords("english"))
   #strip whitespace
   myDocs[[k]] <- tm_map(myDocs[[k]], stripWhitespace)
   #treat as text
@@ -166,7 +159,7 @@ tmp1 <- setDT(tmp1, keep.rownames = TRUE)[]
 tmp2 <- as.data.frame(freq_trigram[[2]])
 colnames(tmp2) <- 'frequency'
 tmp2 <- setDT(tmp2, keep.rownames = TRUE)[]
-freq_trigram_all <- full_join(tmp1, tmp2, by = 'rn')
+freq_trigram_all <- setDT(full_join(tmp1, tmp2, by = 'rn'))
 freq_trigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by = rn]
 freq_trigram_all[, frequency.x := NULL]
 freq_trigram_all[, frequency.y := NULL]
@@ -175,7 +168,7 @@ for (k in 3:NUM_CHUNKS) {
   tmp <- as.data.frame(freq_trigram[[k]])
   colnames(tmp) <- 'frequency'
   tmp <- setDT(tmp, keep.rownames = TRUE)[]
-  freq_trigram_all <- full_join(freq_trigram_all, tmp, by = 'rn')
+  freq_trigram_all <- setDT(full_join(freq_trigram_all, tmp, by = 'rn'))
   freq_trigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by = rn]
   freq_trigram_all[, frequency.x := NULL]
   freq_trigram_all[, frequency.y := NULL]
@@ -203,8 +196,6 @@ for (k in 1:NUM_CHUNKS) {
   myDocs[[k]] <- tm_map(myDocs[[k]], removeNumbers)
   #convert to lowercase
   myDocs[[k]] <- tm_map(myDocs[[k]], tolower)
-  #remove stopwords
-  myDocs[[k]] <- tm_map(myDocs[[k]], removeWords, stopwords("english"))
   #strip whitespace
   myDocs[[k]] <- tm_map(myDocs[[k]], stripWhitespace)
   #treat as text
@@ -222,7 +213,7 @@ tmp1 <- setDT(tmp1, keep.rownames = TRUE)[]
 tmp2 <- as.data.frame(freq_quadgram[[2]])
 colnames(tmp2) <- 'frequency'
 tmp2 <- setDT(tmp2, keep.rownames = TRUE)[]
-freq_quadgram_all <- full_join(tmp1, tmp2, by = 'rn')
+freq_quadgram_all <- setDT(full_join(tmp1, tmp2, by = 'rn'))
 freq_quadgram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by = rn]
 freq_quadgram_all[, frequency.x := NULL]
 freq_quadgram_all[, frequency.y := NULL]
@@ -231,7 +222,7 @@ for (k in 3:NUM_CHUNKS) {
   tmp <- as.data.frame(freq_quadgram[[k]])
   colnames(tmp) <- 'frequency'
   tmp <- setDT(tmp, keep.rownames = TRUE)[]
-  freq_quadgram_all <- full_join(freq_quadgram_all, tmp, by = 'rn')
+  freq_quadgram_all <- setDT(full_join(freq_quadgram_all, tmp, by = 'rn'))
   freq_quadgram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by = rn]
   freq_quadgram_all[, frequency.x := NULL]
   freq_quadgram_all[, frequency.y := NULL]
@@ -242,5 +233,5 @@ rm(freq_quadgram, tmp)
 save(freq_unigram_all, freq_bigram_all, freq_trigram_all, freq_quadgram_all, file = '/storage/laur/Personal/MasneriStefano/data/freq_1234.rda')
 
 # Clear memory
-rm(list = ls())
-gc()
+#rm(list = ls())
+#gc()
