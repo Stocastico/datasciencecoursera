@@ -1,4 +1,4 @@
-findBestTrigram <- function(freqDF, text) {
+findBestNgram <- function(freqDF, text) {
   regex <- paste("^", text, " [a-z]+", sep = "")
   tf <- grepl(regex, freqDF[, 1])
   matches <- freqDF[tf, ]
