@@ -121,7 +121,7 @@ trigram_sparse <- simple_sparse_array(i = indexes, v = freq_trigram_separate_agg
 
 #### QUADGRAM ####
 #load the data
-load('/storage/laur/Personal/MasneriStefano/data/freq_4.rda')
+#load('/storage/laur/Personal/MasneriStefano/data/freq_4.rda')
 
 # now for the quadgram. first, reduce the number of elements (at least 3 counts)
 THRESH_4GRAM = 2
@@ -172,3 +172,7 @@ colnames(freq_4gram_separate_aggr) <- c("w1_idx", "w2_idx", "w3_idx", "w4_idx", 
 # then create a sparse matrix to store 4-grams frequencies
 indexes <- as.matrix(freq_4gram_separate_aggr[, 1:4])
 quadgram_sparse <- simple_sparse_array(i = indexes, v = freq_4gram_separate_aggr$frequency, dim=c(NUM_WORDS, NUM_WORDS, NUM_WORDS, NUM_WORDS))
+
+# save necessary stuff
+save(myDict, idxUnknown, idxStart, idxEnd, freq_unigram_all_thresh, file = '/storage/laur/Personal/MasneriStefano/data/singleWordsInfo.rda')
+save(bigram_sparse, trigram_sparse, quadgram_sparse, file = '/storage/laur/Personal/MasneriStefano/data/sparseMatrices.rda')

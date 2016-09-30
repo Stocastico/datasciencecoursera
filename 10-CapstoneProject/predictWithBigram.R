@@ -6,9 +6,10 @@ predictWithBigram <- function(words, dict, matrix2Gram, trieIdx) {
   
   #ok, now words has length 2. Check that first word is in dictionary
   if (words[1] %in% myDict) {
-    
+    # get the index of the word
   }
   else {
     # just output the most common words
+    prediction <- c("said", "will", "just", "one", "like")
   }
 }

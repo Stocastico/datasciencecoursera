@@ -14,14 +14,19 @@ source('~/Desktop/datasciencecoursera/10-CapstoneProject/importData.R')
 data <- importData('/home/masneris/Downloads/final/en_US/')
 data <- c(data[[1]], data[[2]], data[[3]])
 
-#SPLIT INTO 10 GROUPS
-chunks <- split(data, ceiling(seq_along(data) / (length(data)/10)))
+#Remove punctuation, but keep apostrophe
+data <- gsub("[^[:alnum:][:space:]']", "", data)
+
+NUM_CHUNKS <- 20
+
+#SPLIT INTO 20 GROUPS
+chunks <- split(data, ceiling(seq_along(data) / (length(data)/NUM_CHUNKS)))
 
 #PROCESS UNIGRAM
 myDocs <- list()
 dtm_unigram <- list()
 freq_unigram <- list()
-for (k in 1:length(chunks)) {
+for (k in 1:NUM_CHUNKS) {
   myDocs[[k]] <- Corpus(VectorSource(chunks[[k]]))
   # DATA PROPEROCESSING
   # remove punctuation
@@ -36,7 +41,7 @@ for (k in 1:length(chunks)) {
   myDocs[[k]] <- tm_map(myDocs[[k]], stripWhitespace)
   #treat as text
   myDocs[[k]] <- tm_map(myDocs[[k]], PlainTextDocument)
-  dtm_unigram[[k]] <- DocumentTermMatrix(myDocs[[k]], control=list(wordLengths=c(1,Inf)))
+  dtm_unigram[[k]] <- DocumentTermMatrix(myDocs[[k]], control=list(wordLengths=c(0,Inf)))
   freq_unigram[[k]] <- col_sums(dtm_unigram[[k]])
 }
 rm(myDocs)
@@ -54,7 +59,7 @@ freq_unigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by 
 freq_unigram_all[, frequency.x := NULL]
 freq_unigram_all[, frequency.y := NULL]
 rm(tmp1, tmp2)
-for (k in 3:10) {
+for (k in 3:20) {
   tmp <- as.data.frame(freq_unigram[[k]])
   colnames(tmp) <- 'frequency'
   tmp <- setDT(tmp, keep.rownames = TRUE)[]
@@ -66,23 +71,20 @@ for (k in 3:10) {
 rm(freq_unigram)
 
 
-# NOW FOR THE BIGRAM. FIRST REMOVE PUNCTUATION.
-dataNoPunct <- gsub("[[:punct:]]", "", data)
-
 # THEN ADD START AND END OF SENTENCE MARKERS
-for (k in 1:length(dataNoPunct)) {
-  dataNoPunct[k] <- paste0('<s> ', dataNoPunct[k], ' </s>')
+for (k in 1:length(data)) {
+  dataNoPunct[k] <- paste0('<s> ', data[k], ' </s>')
 }
 
-#SPLIT INTO 10 GROUPS
-chunks <- split(dataNoPunct, ceiling(seq_along(dataNoPunct) / (length(dataNoPunct)/10)))
+#SPLIT INTO 0 GROUPS
+chunks <- split(dataNoPunct, ceiling(seq_along(dataNoPunct) / (length(dataNoPunct)/NUM_CHUNKS)))
 
 #PROCESS BIGRAM
 myDocs <- list()
 dtm_bigram <- list()
 freq_bigram <- list()
 BigramTokenizer <- function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)
-for (k in 1:length(chunks)) {
+for (k in 1:NUM_CHUNKS) {
   myDocs[[k]] <- Corpus(VectorSource(chunks[[k]]))
   # DATA PROPEROCESSING
   #remove numbers
@@ -113,7 +115,7 @@ freq_bigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by =
 freq_bigram_all[, frequency.x := NULL]
 freq_bigram_all[, frequency.y := NULL]
 rm(tmp1, tmp2)
-for (k in 3:10) {
+for (k in 3:NUM_CHUNKS) {
   tmp <- as.data.frame(freq_bigram[[k]])
   colnames(tmp) <- 'frequency'
   tmp <- setDT(tmp, keep.rownames = TRUE)[]
@@ -130,15 +132,15 @@ for (k in 1:length(dataNoPunct)) {
   dataNoPunctTri[k] <- paste0('<s> ', dataNoPunct[k])
 }
 
-#SPLIT INTO 10 GROUPS
-chunks <- split(dataNoPunctTri, ceiling(seq_along(dataNoPunctTri) / (length(dataNoPunctTri)/10)))
+#SPLIT INTO 20 GROUPS
+chunks <- split(dataNoPunctTri, ceiling(seq_along(dataNoPunctTri) / (length(dataNoPunctTri)/NUM_CHUNKS)))
 
 #PROCESS TRIGRAM
 myDocs <- list()
 dtm_trigram <- list()
 freq_trigram <- list()
 TrigramTokenizer <- function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " "), use.names = FALSE)
-for (k in 1:length(chunks)) {
+for (k in 1:NUM_CHUNKS) {
   myDocs[[k]] <- Corpus(VectorSource(chunks[[k]]))
   # DATA PROPEROCESSING
   #remove numbers
@@ -169,7 +171,7 @@ freq_trigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by 
 freq_trigram_all[, frequency.x := NULL]
 freq_trigram_all[, frequency.y := NULL]
 rm(tmp1, tmp2)
-for (k in 3:10) {
+for (k in 3:NUM_CHUNKS) {
   tmp <- as.data.frame(freq_trigram[[k]])
   colnames(tmp) <- 'frequency'
   tmp <- setDT(tmp, keep.rownames = TRUE)[]
@@ -186,15 +188,15 @@ for (k in 1:length(dataNoPunctTri)) {
   dataNoPunctQuad[k] <- paste0('<s> ', dataNoPunctTri[k])
 }
 
-#SPLIT INTO 10 GROUPS
-chunks <- split(dataNoPunctQuad, ceiling(seq_along(dataNoPunctQuad) / (length(dataNoPunctQuad)/10)))
+#SPLIT INTO 20 GROUPS
+chunks <- split(dataNoPunctQuad, ceiling(seq_along(dataNoPunctQuad) / (length(dataNoPunctQuad)/NUM_CHUNKS)))
 
 #PROCESS QUADGRAM
 myDocs <- list()
 dtm_quadgram <- list()
 freq_quadgram <- list()
 QuadgramTokenizer <- function(x) unlist(lapply(ngrams(words(x), 4), paste, collapse = " "), use.names = FALSE)
-for (k in 1:length(chunks)) {
+for (k in 1:NUM_CHUNKS) {
   myDocs[[k]] <- Corpus(VectorSource(chunks[[k]]))
   # DATA PROPEROCESSING
   #remove numbers
@@ -225,7 +227,7 @@ freq_quadgram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by
 freq_quadgram_all[, frequency.x := NULL]
 freq_quadgram_all[, frequency.y := NULL]
 rm(tmp1, tmp2)
-for (k in 3:10) {
+for (k in 3:NUM_CHUNKS) {
   tmp <- as.data.frame(freq_quadgram[[k]])
   colnames(tmp) <- 'frequency'
   tmp <- setDT(tmp, keep.rownames = TRUE)[]
@@ -235,3 +237,10 @@ for (k in 3:10) {
   freq_quadgram_all[, frequency.y := NULL]
 }
 rm(freq_quadgram, tmp)
+
+# Save data
+save(freq_unigram_all, freq_bigram_all, freq_trigram_all, freq_quadgram_all, file = '/storage/laur/Personal/MasneriStefano/data/freq_1234.rda')
+
+# Clear memory
+rm(list = ls())
+gc()
