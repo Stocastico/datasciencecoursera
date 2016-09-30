@@ -8,9 +8,6 @@
 # RStudio files
 .Rproj.user/
 
-#Large text files
-10-CapstoneProject/sampleDatasets/
-
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
