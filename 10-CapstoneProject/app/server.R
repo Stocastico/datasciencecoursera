@@ -1,0 +1,24 @@
+library(shiny)
+library(slam)
+
+#object visible across all sessions, containing my ngram frequencies
+#load('freq_1234.rds')
+
+#source the required functions
+#source('../cleanInput.R') #Preprocess the input text and return a vector of three words
+#source('../predictText.R') #Perform text prediction
+source('../createHtmlButtons.R') #Create the output buttons
+
+# Define server logic required to print the output
+shinyServer(function(input, output) {
+  # Call the function predictText to get a list of predicted words 
+  
+  output$predictions <- renderUI({
+    #preprocess input    
+    #cleanesInput <- cleanInput(input$textIn)
+    #predict text
+    #predictions <- predictText(cleanedInput)
+    #create output
+    HTML(createHtmlButtons(c('a', 'b', 'c')))
+  })
+})
