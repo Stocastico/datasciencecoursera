@@ -5,8 +5,8 @@ library(slam)
 #load('freq_1234.rds')
 
 #source the required functions
-#source('../cleanInput.R') #Preprocess the input text and return a vector of three words
-#source('../predictText.R') #Perform text prediction
+source('../cleanInput.R') #Preprocess the input text and return a vector of three words
+source('../predictNextWord.R') #Perform text prediction
 source('../createHtmlButtons.R') #Create the output buttons
 
 # Define server logic required to print the output

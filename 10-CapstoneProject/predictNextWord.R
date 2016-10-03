@@ -1,3 +1,9 @@
+source('./predictWithTrigram.R')
+source('./predictWithBigram.R')
+
+#Assumes input has already been processed.
+#sentence is a char vector of length 3
+
 predictNextWord <- function(sentence, dict, matrix4Gram, matrix3Gram, matrix2Gram, trieIdx) {
   input <- unlist(strsplit(sentence, " "))
   numWords <- length(input)
