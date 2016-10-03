@@ -1,30 +1,17 @@
-source('./predictWithTrigram.R')
-source('./predictWithBigram.R')
-
 #Assumes input has already been processed.
-#sentence is a char vector of length 3
+#words is a char vector of length 3
+#returns the top 5 predictions of the model
 
-predictNextWord <- function(sentence, dict, matrix4Gram, matrix3Gram, matrix2Gram, trieIdx) {
-  input <- unlist(strsplit(sentence, " "))
-  numWords <- length(input)
-  if (numWords >= 3) {
-    words <- input[numWords-2:numWords]
-  }
-  else if (length(input)  == 2) {
-    words <- c('<s>', words)
-  }
-  else if (length(input)  == 1) {
-    words <- c('<s>', '<s>', words)
-  }
-  else {
-    words <- input
-  }
+predictNextWord <- function(words, dict, matrix4Gram, matrix3Gram, matrix2Gram, trieIdx) {
   
-  #ok, now words has length 3. Check that first word is in dictionary
+  #ok, using the trie map from words to index in the dictionary
   if (words[1] %in% myDict) {
     
   }
   else {
-    predictWithTrigram(words(2:3), dict, matrix3Gram, matrix2Gram, trieIdx)
+    
   }
+  
+  #if necessary
+  #predictWithTrigram(words(2:3), dict, matrix3Gram, matrix2Gram, trieIdx)
 }
