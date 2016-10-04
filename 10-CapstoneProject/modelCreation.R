@@ -28,7 +28,7 @@ dtm_unigram <- list()
 freq_unigram <- list()
 for (k in 1:NUM_CHUNKS) {
   myDocs[[k]] <- Corpus(VectorSource(chunks[[k]]))
-  # DATA PROPEROCESSING
+  # DATA PREPROCESSING
   #remove numbers
   myDocs[[k]] <- tm_map(myDocs[[k]], removeNumbers)
   #convert to lowercase

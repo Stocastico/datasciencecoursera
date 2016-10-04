@@ -1,5 +1,5 @@
 #ASSUME DATA HAS BEEN LÖOADED FROM DISK
-#load('/storage/laur/Personal/MasneriStefano/data/freq_123.rda')
+load('/storage/laur/Personal/MasneriStefano/data/freq_1234.rda')
 
 # required libraries
 library(triebeard)
