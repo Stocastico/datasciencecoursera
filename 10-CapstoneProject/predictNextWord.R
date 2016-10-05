@@ -1,38 +1,34 @@
 #Assumes input has already been processed.
 #words is a char vector of length 3
-#returns the top 5 predictions of the model
+#returns the top-N predictions of the model
 library(slam)
-library(Matrix)
 
-predictNextWord <- function(words, dict, matrix4Gram, matrix3Gram, matrix2Gram, trieIdx) {
+predictNextWord <- function(words, dict, matrix4Gram, matrix3Gram, matrix2Gram, numPredictions) {
   
-  idxUnk <- longest_match(trie = trieIdx, to_match = '<UNK>')
+  idxUnk <- match('<UNK>', dict)
   idx <- c(idxUnk, idxUnk, idxUnk)
   
   for (k in 1:3) {
-    #ok, using the trie map from words to index in the dictionary
-    if (words[k] %in% myDict) {
-      idx[k] <- longest_match(trie = trieIdx, to_match = words[k])
+    if (words[k] %in% dict) {
+      idx[k] <- match(words[k], dict)
     }
   }
   
   wordsArray <- drop_simple_sparse_array(matrix4Gram[idx[1], idx[2], idx[3], ])
   
-  numMatches <- nnzero(wordsArray$v)
+  numMatches <- length(wordsArray$v)
   
-  if ( numMatches >= 5) {
-    topFreq <- tail(sort.int(wordsArray$v, partial = length(wordsArray$v) - 4), 5)
-    topIdx <- wordsArray$i[topFreq]
+  if (numMatches >= numPredictions) {
+    ord <- order(wordsArray$v, decreasing = TRUE)
+    topIdx <- wordsArray$i[ord[1:numPredictions]]
     myDict[topIdx]
   } else if ( numMatches > 0 ) {
-    topFreq <- tail(sort.int(wordsArray$v, partial = length(wordsArray$v) - (numMatches-1)), numMatches)
-    topIdx <- wordsArray$i[topFreq]
-    myDict[topIdx]
-  } else { # todo 
-    
+    ord <- order(wordsArray$v, decreasing = TRUE)
+    topIdx <- wordsArray$i[ord[1:numMatches]]
+    trigramPred <- predictWithTrigram(words[2:3], dict, matrix3Gram, matrix2Gram, numPredictions-numMatches)
+    c(myDict[topIdx], trigramPred)
+  } else { # No matches found! 
+    trigramPred <- predictWithTrigram(words[2:3], dict, matrix3Gram, matrix2Gram, numPredictions)
+    trigramPred
   }
-  #order <- order(wordsArray, decreasing = TRUE)
-  
-  #if necessary
-  #predictWithTrigram(words(2:3), dict, matrix3Gram, matrix2Gram, trieIdx)
 }

@@ -1,8 +1,10 @@
 library(shiny)
 library(slam)
+library(Matrix)
 
 #object visible across all sessions, containing my ngram frequencies
-#load('freq_1234.rds')
+load('singleWordsInfo.rda')
+load('sparseMatrices.rda')
 
 #source the required functions
 source('../cleanInput.R')         #Preprocess the input text and return a vector of three words
