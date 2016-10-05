@@ -1,5 +1,8 @@
-#ASSUME DATA HAS BEEN LÖOADED FROM DISK
-load('/storage/laur/Personal/MasneriStefano/data/freq_1234.rda')
+#ASSUME DATA HAS BEEN LOADED FROM DISK
+load('/storage/laur/Personal/MasneriStefano/data/freq_1.rda')
+load('/storage/laur/Personal/MasneriStefano/data/freq_2.rda')
+load('/storage/laur/Personal/MasneriStefano/data/freq_3.rda')
+load('/storage/laur/Personal/MasneriStefano/data/freq_4.rda')
 
 # required libraries
 library(triebeard)
@@ -10,8 +13,8 @@ library(tidyr)
 
 #### UNIGRAM ####
 
-# reduce number of elements, keep all elements with at least 10 counts
-THRESH_UNIGRAM = 50 
+# reduce number of elements, keep all elements with at least 70 counts
+THRESH_UNIGRAM = 70 
 freq_unigram_all_thresh = freq_unigram_all[freq_unigram_all$frequency >= THRESH_UNIGRAM, ]
 
 # add symbol for start and end of sentence, will be required later
@@ -39,7 +42,7 @@ idxEnd <- longest_match(trieIdx, to_match = '</s>')
 #### BIGRAM ####
 
 # now for the bigram. first, reduce the number of elements (at least 3 counts)
-THRESH_BIGRAM = 3
+THRESH_BIGRAM = 4
 freq_bigram_all_thresh = freq_bigram_all[freq_bigram_all$frequency >= THRESH_BIGRAM, ]
 
 # split the words in bigram
@@ -77,7 +80,7 @@ bigram_sparse <- simple_sparse_array(i = indexes, v = freq_bigram_separate_aggr$
 #### TRIGRAM ####
 
 # now for the trigram. first, reduce the number of elements (at least 3 counts)
-THRESH_TRIGRAM = 2
+THRESH_TRIGRAM = 3
 freq_trigram_all_thresh = freq_trigram_all[freq_trigram_all$frequency >= THRESH_TRIGRAM, ]
 
 # split the words in trigram
@@ -120,8 +123,6 @@ indexes <- as.matrix(freq_trigram_separate_aggr[, 1:3])
 trigram_sparse <- simple_sparse_array(i = indexes, v = freq_trigram_separate_aggr$frequency, dim=c(NUM_WORDS, NUM_WORDS, NUM_WORDS))
 
 #### QUADGRAM ####
-#load the data
-#load('/storage/laur/Personal/MasneriStefano/data/freq_4.rda')
 
 # now for the quadgram. first, reduce the number of elements (at least 3 counts)
 THRESH_4GRAM = 2

@@ -56,7 +56,7 @@ freq_unigram_all[, frequency := sum(frequency.x, frequency.y, na.rm = TRUE), by 
 freq_unigram_all[, frequency.x := NULL]
 freq_unigram_all[, frequency.y := NULL]
 rm(tmp1, tmp2)
-for (k in 3:20) {
+for (k in 3:NUM_CHUNKS) {
   tmp <- as.data.frame(freq_unigram[[k]])
   colnames(tmp) <- 'frequency'
   tmp <- setDT(tmp, keep.rownames = TRUE)[]
@@ -66,9 +66,10 @@ for (k in 3:20) {
   freq_unigram_all[, frequency.y := NULL]
 }
 rm(freq_unigram)
-
+save(freq_unigram_all, file = '/storage/laur/Personal/MasneriStefano/data/freq_1.rda')
 
 # THEN ADD START AND END OF SENTENCE MARKERS
+dataNoPunct <- data
 for (k in 1:length(data)) {
   dataNoPunct[k] <- paste0('<s> ', data[k], ' </s>')
 }
@@ -120,6 +121,7 @@ for (k in 3:NUM_CHUNKS) {
   freq_bigram_all[, frequency.y := NULL]
 }
 rm(freq_bigram)
+save(freq_bigram_all, file = '/storage/laur/Personal/MasneriStefano/data/freq_2.rda')
 
 # NOW FOR THE TRIGRAM. ADD ANOTHER SYMBOL FOR START OF SENTENCE
 dataNoPunctTri <- dataNoPunct
@@ -174,6 +176,7 @@ for (k in 3:NUM_CHUNKS) {
   freq_trigram_all[, frequency.y := NULL]
 }
 rm(freq_trigram)
+save(freq_trigram_all, file = '/storage/laur/Personal/MasneriStefano/data/freq_3.rda')
 
 # NOW FOR THE QUADGRAM. ADD ANOTHER SYMBOL FOR START OF SENTENCE
 dataNoPunctQuad <- dataNoPunctTri
@@ -227,10 +230,9 @@ for (k in 3:NUM_CHUNKS) {
   freq_quadgram_all[, frequency.x := NULL]
   freq_quadgram_all[, frequency.y := NULL]
 }
-rm(freq_quadgram, tmp)
+rm(dtm_quadgram, freq_quadgram, tmp)
 
-# Save data
-save(freq_unigram_all, freq_bigram_all, freq_trigram_all, freq_quadgram_all, file = '/storage/laur/Personal/MasneriStefano/data/freq_1234.rda')
+save(freq_quadgram_all, file = '/storage/laur/Personal/MasneriStefano/data/freq_4.rda')
 
 # Clear memory
 #rm(list = ls())
