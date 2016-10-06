@@ -3,6 +3,10 @@
 #returns the top-N predictions of the model
 library(slam)
 
+#object visible across all sessions, containing my ngram frequencies
+load('./data/singleWordsInfo.rda')
+load('./data/sparseMatrices.rda')
+
 predictNextWord <- function(words, dict, matrix4Gram, matrix3Gram, matrix2Gram, numPredictions) {
 
   if (is.null(words)) {

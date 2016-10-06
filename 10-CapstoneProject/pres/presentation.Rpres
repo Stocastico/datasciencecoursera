@@ -1,7 +1,7 @@
-Data Science Specialization Text Prediction App
+Text Prediction App
 ========================================================
 author: Stefano Masneri
-date: October 3rd, 2016
+date: October 6th, 2016
 autosize: true
 transition: concave
 transition-speed: slow

@@ -1,10 +1,6 @@
 library(shiny)
 library(slam)
 
-#object visible across all sessions, containing my ngram frequencies
-load('./data/singleWordsInfo.rda')
-load('./data/sparseMatrices.rda')
-
 #source the required functions
 source('./cleanInput.R')         #Preprocess the input text and return a vector of three words
 source('./predictNextWord.R')    #Perform text prediction

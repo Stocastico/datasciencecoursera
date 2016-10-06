@@ -1,0 +1,9 @@
+name: Text_Prediction
+account: stocastico
+server: shinyapps.io
+appId: 129883
+bundleId: 578398
+url: https://stocastico.shinyapps.io/Text_Prediction/
+when: 1475750971.42934
+asMultiple: FALSE
+asStatic: FALSE
