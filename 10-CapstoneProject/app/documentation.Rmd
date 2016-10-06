@@ -1,0 +1,45 @@
+---
+title: "Text Prediction Documentation"
+author: "Stefano Masneri"
+date: "6 Oktober 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This is the documentation for the text prediction app. The app is available on shinyapps adn can be tested here: <http://stocastico.shinyapps.com/Text_Prediction>.
+
+The app uses a language model based on 4-Grams. For more info on language model, see here: 
+<https://web.stanford.edu/class/cs124/lec/languagemodeling.pdf>
+
+## Creation of the model
+
+The dataset has been provided by Coursera and Swiftkey and included text from news, twitter and blogs.
+The language model used 90% of the data in English language for training, while the remaining 10% has
+ been used for testing the model.
+
+The data has been preprocessed to remove punctuation, numbers and special characters, as well as converted 
+to lowercase and stripped of any profanity words.
+
+After preprocessing, the model computed all the unigrams, bigrams, trigrams and quadgrams.
+Since the amount of memory required for this steps is huge, the data was split into chunks and later combined.
+For each N-gram both the value (the string) and its count is stored.
+
+## Data reduction
+
+In order to remove the memory consumption the all the ungrams with frequency < 70 have been removed 
+and the set of words remaining (around 35000) has been used as vocabulary. All the words in the bigrams, 
+trigrams and quadgrams not appearing in the vocabulary were replaced with a special word.
+Finally, data for the N-grams was stored in multidimensional sparse arrays to further remove the memory required.
+
+## Using the model.
+
+The model takes a text as input (for example for quadgrams the last 3 words of a sentence) 
+and, to compute the predictions, extracts the word indeces for each word and plugs them in the 
+sparse array used for 4-grams. The array is subsetted (reducing its dimensionality from 4 to 1) and from there
+ only the 5 values with the highest counts are stored. From these 5 indices we use the vocabulary to
+ extract the corresponding words, which are then presented to the user

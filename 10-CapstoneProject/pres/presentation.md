@@ -45,11 +45,13 @@ The model has been evaluated by selecting a subset of the corpus and trying to p
 - The top-3 accuracy is <span style="color:red;">*53%*</span> and the top-5 accuracy is <span style="color:red;">*64%*</span>
 - Using special words for start of sentence and unknown words gives a smaller increse of accuracy (<span style="color:red;">*~3.5%*</span>)
 - The model implements *stupid backoff*.
-- Good-Turing backoff was tested but didn't give any improvements in accuracy 
+- Good-Turing backoff was tested but didn't give any improvements in accuracy
 
 Shiny Application
 ========================================================
 type: section
 
-A shiny application demonstrating the model is available [here](add.link.com).
+A shiny application demonstrating the model is available [here](http://stocastico.shinyapps.com/Text_Prediction).
+
+![screenshot](./presentation-figure/textPred.png)
 
