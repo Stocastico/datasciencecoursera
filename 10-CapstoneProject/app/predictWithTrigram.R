@@ -25,11 +25,11 @@ predictWithTrigram <- function(words, dict, matrix3Gram, matrix2Gram, numPredict
   } else if ( numMatches > 0 ) {
     ord <- order(wordsArray$v, decreasing = TRUE)
     topIdx <- wordsArray$i[ord[1:numMatches]]
-    bigramPred <- predictWithBigram(words(2), dict, matrix2Gram, numPredictions - numMatches)
+    bigramPred <- predictWithBigram(words[2], dict, matrix2Gram, numPredictions - numMatches)
     prediction <- c(myDict[topIdx], bigramPred)
     return(prediction)
   } else { # No matches found!
-    bigramPred <- predictWithBigram(words(2), dict, matrix2Gram, numPredictions)
+    bigramPred <- predictWithBigram(words[2], dict, matrix2Gram, numPredictions)
     return(bigramPred)
   }
 }
